@@ -10,15 +10,22 @@ class UUDSDialogueDataAsset;
 UCLASS()
 class UIDIALOGSYSTEM_API UUDSDialogueManagerSubsystem : public UGameInstanceSubsystem
 {
+public:
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
+private:
 	GENERATED_BODY()
 
 public:
 	// Constructor for the dialogue manager subsystem
 	UUDSDialogueManagerSubsystem();
 
+	UFUNCTION(BlueprintCallable, Category = "Dialogue")
+	void Init(TSubclassOf<class UUDSDialogueWidget> InDialogueWidgetClass, UDataTable* InHoverKeywordsDataTable);
+
 	// Starts the dialogue sequence with the provided dialogue data asset
 	UFUNCTION(BlueprintCallable, Category = "Dialogue")
-	void StartDialogue(UUDSDialogueDataAsset* DialogueDataAsset, UDataTable* KeywordsDataTable);
+	void StartDialogue(UUDSDialogueDataAsset* DialogueDataAsset);
 
 	// The hover keywords data table
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Keywords")

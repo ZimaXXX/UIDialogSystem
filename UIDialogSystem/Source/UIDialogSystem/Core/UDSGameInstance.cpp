@@ -2,10 +2,10 @@
 
 #include "UIDialogSystem/Dialogue/UDSDialogueManagerSubsystem.h"
 
-void UUDSGameInstance::InitializeDialogueSubsystem(UUDSDialogueDataAsset* DialogueDataAsset, UDataTable* KeywordsDataTable)
+void UUDSGameInstance::StartDialogueSubsystem(UUDSDialogueDataAsset* DialogueDataAsset)
 {
 	if (UUDSDialogueManagerSubsystem* DialogueSubsystem = GetSubsystem<UUDSDialogueManagerSubsystem>())
 	{
-		DialogueSubsystem->StartDialogue(DialogueDataAsset, KeywordsDataTable);
+		DialogueSubsystem->StartDialogue(DialogueDataAsset);
 	}
-}	
+}

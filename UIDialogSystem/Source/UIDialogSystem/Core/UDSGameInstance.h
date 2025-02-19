@@ -14,5 +14,5 @@ class UIDIALOGSYSTEM_API UUDSGameInstance : public UGameInstance
 public:
 	// Function to initialize the dialogue subsystem with a data asset
 	UFUNCTION(BlueprintCallable, Category = "Dialogue")
-	void InitializeDialogueSubsystem(UUDSDialogueDataAsset* DialogueDataAsset, UDataTable* KeywordsDataTable);
+	void StartDialogueSubsystem(UUDSDialogueDataAsset* DialogueDataAsset);
 };

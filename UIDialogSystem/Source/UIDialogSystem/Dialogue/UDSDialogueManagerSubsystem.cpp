@@ -3,16 +3,27 @@
 #include "Data/UDSDialogueDataAsset.h"
 #include "Widgets/UDSDialogueWidget.h"
 
+void UUDSDialogueManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
+{
+	Super::Initialize(Collection);
+}
+
 UUDSDialogueManagerSubsystem::UUDSDialogueManagerSubsystem()
 {
 }
 
-void UUDSDialogueManagerSubsystem::StartDialogue(UUDSDialogueDataAsset* DialogueDataAsset, UDataTable* KeywordsDataTable)
+void UUDSDialogueManagerSubsystem::Init(TSubclassOf<class UUDSDialogueWidget> InDialogueWidgetClass,
+	UDataTable* InHoverKeywordsDataTable)
+{
+	DialogueWidgetClass = InDialogueWidgetClass;
+	HoverKeywordsDataTable = InHoverKeywordsDataTable;
+}
+
+void UUDSDialogueManagerSubsystem::StartDialogue(UUDSDialogueDataAsset* DialogueDataAsset)
 {
 	if (DialogueDataAsset)
 	{
 		DialogueQueue = DialogueDataAsset->DialogueEntries;
-		HoverKeywordsDataTable = KeywordsDataTable;
 		CurrentDialogueIndex = 0;
 		ShowNextDialogue();
 	}
