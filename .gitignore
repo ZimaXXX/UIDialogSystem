@@ -72,3 +72,9 @@ Plugins/**/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+StarterContent
+/UIDialogSystem/Intermediate
+/UIDialogSystem/Saved
+/UIDialogSystem/DerivedDataCache
+/UIDialogSystem/Binaries
+/UIDialogSystem/*.vsconfig
