@@ -1,75 +1,84 @@
 ﻿#pragma once
-	
+
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "UDSDialogueWidget.generated.h"
 
+struct FUDSHoverKeywordRow;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTypingFinishedDelegate);
+
 class UUDSCharacterConfigDataAsset;
-// Struct for a single dialogue entry
+
 USTRUCT(BlueprintType)
 struct FUDSDialogueEntry
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-	// The character configuration data asset
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSoftObjectPtr<UUDSCharacterConfigDataAsset> CharacterConfig;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TSoftObjectPtr<UUDSCharacterConfigDataAsset> CharacterConfig;
 
-	// The dialogue text to be displayed
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FText DialogueText;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (MultiLine = true))
+    FText DialogueText;
 };
+
 UCLASS()
 class UIDIALOGSYSTEM_API UUDSDialogueWidget : public UUserWidget
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	// Sets the dialogue entry to be displayed in the widget
-	UFUNCTION(BlueprintCallable, Category = "Dialogue")
-	void SetDialogue(const FUDSDialogueEntry& DialogueEntry);
+    UPROPERTY(BlueprintAssignable, Category = "Dialogue")
+    FOnTypingFinishedDelegate OnTypingFinishedDelegate;
+    
 
-	// Starts the typewriter effect for displaying dialogue text
-	UFUNCTION(BlueprintCallable, Category = "Dialogue")
-	void StartTypewriterEffect(float Speed);
 
-	// Skips the typewriter effect and displays the full dialogue text immediately
-	UFUNCTION(BlueprintCallable, Category = "Dialogue")
-	void SkipTypewriterEffect();
+    UFUNCTION(BlueprintCallable, Category = "Dialogue")
+    void SetDialogue(const FUDSDialogueEntry& DialogueEntry);
+    FString ApplyRichTextFormatting();
+    FString GetWordFromString(const FString& Text, FString& OutPrefix, FString& OutPostfix, int32 Index = 0);
 
+    UFUNCTION(BlueprintCallable, Category = "Dialogue")
+    void StartTypewriterEffect(float Rate);
+
+    UFUNCTION(BlueprintCallable, Category = "Dialogue")
+    void SkipTypewriterEffect();
+
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Typewriter")
+    float TypingRate = 0.05f;
+
+    UFUNCTION(BlueprintPure)
+    bool IsTypingFinished() const { return bIsTypingFinished;}
+
+    UPROPERTY()
+    UDataTable* KeywordsDataTable;
 private:
-	// Image component for displaying the character's portrait
-	UPROPERTY(meta = (BindWidget))
-	class UImage* CharacterImage;
+    UPROPERTY(meta = (BindWidget))
+    class UImage* CharacterImage;
 
-	// Text block for displaying the character's name
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* CharacterNameText;
+    UPROPERTY(meta = (BindWidget))
+    class UTextBlock* CharacterNameText;
 
-	// Rich text block for displaying the dialogue text with formatting
-	UPROPERTY(meta = (BindWidget))
-	class URichTextBlock* DialogueRichText;
+    UPROPERTY(meta = (BindWidget))
+    class URichTextBlock* DialogueRichText;
 
-	// Full dialogue text to be displayed
-	FText FullDialogueText;
-	
-	// Current dialogue string being displayed by the typewriter effect
-	FString CurrentDialogueString;
-	
-	// Index of the current character in the dialogue text being displayed
-	int32 DialogueIndex = 0;
-	
-	// Timer handle for the typewriter effect
-	FTimerHandle TypewriterTimerHandle;
+    FText FullDialogueText;
+    FString CurrentDialogueString;
+    int32 DialogueIndex = 0;
+    FTimerHandle TypewriterTimerHandle;
+    
+    void UpdateTypewriterEffect();
+    FString GetCurrentlyTypedWord();
 
-	// Updates the typewriter effect by adding the next character to the dialogue string
-	void UpdateTypewriterEffect();
-	
-	// Handles keyword hover events to display tooltips
-	UFUNCTION(BlueprintCallable, Category = "Dialogue")
-	void OnKeywordHovered(const FText& Keyword);
+    UFUNCTION(BlueprintCallable, Category = "Dialogue")
+    void OnKeywordHovered(const FText& Keyword);
 
-	// Handles keyword unhover events to hide tooltips
-	UFUNCTION(BlueprintCallable, Category = "Dialogue")
-	void OnKeywordUnhovered();
+    UFUNCTION(BlueprintCallable, Category = "Dialogue")
+    void OnKeywordUnhovered();
+
+    bool bIsTypingFinished = true;
+
+    UFUNCTION()
+    void OnTypingFinished();
+
+    TArray<FUDSHoverKeywordRow*> GetHoverKeywords();
 };

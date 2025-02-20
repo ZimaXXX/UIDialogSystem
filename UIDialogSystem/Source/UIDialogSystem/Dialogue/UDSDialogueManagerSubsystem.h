@@ -45,5 +45,9 @@ private:
 	// Index of the current dialogue entry being displayed
 	int32 CurrentDialogueIndex;
 
+	UFUNCTION()
 	void ShowNextDialogue();
+
+	UFUNCTION(BlueprintCallable, Category = "Dialogue")
+	void SkipCurrentDialogue();
 };
