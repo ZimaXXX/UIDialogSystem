@@ -91,7 +91,7 @@ FString UUDSDialogueWidget::ApplyRichTextFormatting()
         {
             FString Style = KeywordRows[KeywordRowIndex]->StyleFromDataTable;
             //StyledText += FString::Printf(TEXT("<tooltip text=\"Some Infos\">%s</>"), *CleanWord);
-            StyledText += FString::Printf(TEXT("%s<Tooltip Text=\"Some Infos\">%s</>%s "), *Prefix, *CleanWord, *Postfix);
+            StyledText += FString::Printf(TEXT("%s<Tooltip Text=\"%s\">%s</>%s "), *Prefix, *KeywordRows[KeywordRowIndex]->Description.ToString(), *CleanWord, *Postfix);
         }
         else
         {
