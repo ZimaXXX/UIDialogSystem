@@ -27,4 +27,7 @@ protected:
 	// Style used for tooltip text
 	UPROPERTY(EditAnywhere, Category=Appearance)
 	FTextBlockStyle TooltipTextStyle;
+
+
+	TSharedPtr<STextBlock> CachedWidget;
 };

@@ -64,6 +64,7 @@ private:
     FText FullDialogueText;
     FString CurrentDialogueString;
     int32 DialogueIndex = 0;
+    int32 CurrentTagStartIndex = INDEX_NONE;
     FTimerHandle TypewriterTimerHandle;
     
     void UpdateTypewriterEffect();
@@ -81,4 +82,5 @@ private:
     void OnTypingFinished();
 
     TArray<FUDSHoverKeywordRow*> GetHoverKeywords();
+    FString AppendRichTextFormatting(FString CurrentFormattedString);
 };

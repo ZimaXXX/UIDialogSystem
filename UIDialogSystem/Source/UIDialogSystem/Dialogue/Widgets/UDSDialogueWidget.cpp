@@ -48,6 +48,71 @@ TArray<FUDSHoverKeywordRow*> UUDSDialogueWidget::GetHoverKeywords()
     return KeywordRows;
 }
 
+FString UUDSDialogueWidget::AppendRichTextFormatting(FString CurrentFormattedString)
+{
+    TArray<FUDSHoverKeywordRow*> KeywordRows = GetHoverKeywords();
+    TArray<FString> HighlightedWords;
+    for(FUDSHoverKeywordRow* KeywordRow : KeywordRows)
+    {
+        HighlightedWords.Add(KeywordRow->Keyword.ToString());
+    }
+    FString AdaptedFormattedDialogueString = {};
+    if(CurrentTagStartIndex != INDEX_NONE)
+    {
+        AdaptedFormattedDialogueString = CurrentFormattedString.Mid(CurrentTagStartIndex,  CurrentTagStartIndex);
+    }
+    else
+    {
+        //return &CurrentDialogueString[DialogueIndex];
+        AdaptedFormattedDialogueString = CurrentFormattedString;
+    }    
+
+    if(FChar::IsWhitespace(CurrentDialogueString[DialogueIndex]))
+    {
+        CurrentTagStartIndex = INDEX_NONE;
+        return CurrentFormattedString + CurrentDialogueString[DialogueIndex];
+    }
+    
+    FString Prefix;
+    FString Postfix;
+    FString LastPrefix;
+    FString LastPostix;
+    FString CleanWord = GetWordFromString(FullDialogueText.ToString(), Prefix, Postfix, DialogueIndex);
+    FString Temp = AdaptedFormattedDialogueString;
+    Temp.AppendChar(CurrentDialogueString[DialogueIndex]);
+    FString LastCleanWord = GetWordFromString(CurrentDialogueString, LastPrefix, LastPostix, DialogueIndex);
+    int32 KeywordRowIndex = INDEX_NONE;
+    bool bIsHighlighted = false;
+    if(LastCleanWord.Len() > 0)
+    {
+        KeywordRowIndex = HighlightedWords.IndexOfByKey(CleanWord);
+        bIsHighlighted = KeywordRowIndex != INDEX_NONE;
+    }
+    FString StyledText = AdaptedFormattedDialogueString; // Build the formatted text dynamically
+    if (bIsHighlighted) 
+    {
+        FString Style = KeywordRows[KeywordRowIndex]->StyleFromDataTable;
+        //StyledText += FString::Printf(TEXT("<tooltip text=\"Some Infos\">%s</>"), *CleanWord);
+        if(CleanWord != LastCleanWord)
+        {
+            CurrentTagStartIndex = AdaptedFormattedDialogueString.Len();
+        }
+        else
+        {
+            CurrentTagStartIndex = INDEX_NONE;
+        }
+       
+        StyledText += FString::Printf(TEXT("%s<Tooltip Text=\"%s\">%s</>%s"), *LastPrefix, *KeywordRows[KeywordRowIndex]->Description.ToString(), *LastCleanWord, *LastPostix);
+    }
+    else
+    {
+        StyledText = StyledText.AppendChar(CurrentDialogueString[DialogueIndex]);
+        CurrentTagStartIndex = INDEX_NONE;
+    }
+    
+    return StyledText;
+}
+
 FString UUDSDialogueWidget::ApplyRichTextFormatting()
 {
     TArray<FUDSHoverKeywordRow*> KeywordRows = GetHoverKeywords();
@@ -176,8 +241,9 @@ void UUDSDialogueWidget::UpdateTypewriterEffect()
     if (DialogueIndex < FullDialogueText.ToString().Len())
     {
         CurrentDialogueString += FullDialogueText.ToString()[DialogueIndex];
-        //DialogueRichText->SetText(FText::FromString(CurrentDialogueString));
-        FString FormattedString = ApplyRichTextFormatting();
+        FString FormattedString = DialogueRichText->GetText().ToString();
+        FormattedString = AppendRichTextFormatting(FormattedString);
+        //FString FormattedString = ApplyRichTextFormatting();
         DialogueRichText->SetText(FText::FromString(FormattedString));
         DialogueIndex++;
     }
