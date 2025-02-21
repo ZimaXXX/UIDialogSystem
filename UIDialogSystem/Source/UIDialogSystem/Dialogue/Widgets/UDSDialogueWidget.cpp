@@ -48,29 +48,6 @@ TArray<FUDSHoverKeywordRow*> UUDSDialogueWidget::GetHoverKeywords()
     return KeywordRows;
 }
 
-// FString UUDSDialogueWidget::ApplyRichTextFormatting()
-// {
-//     FString StyledText = CurrentDialogueString;
-//     FString ActiveWord = GetCurrentlyTypedWord();
-//     TArray<FUDSHoverKeywordRow*> KeywordRows = GetHoverKeywords();
-//     for (const FUDSHoverKeywordRow* KeywordRow : KeywordRows)
-//     {
-//         const FString& Word = KeywordRow->Keyword.ToString();
-//         FString Style = KeywordRow->StyleFromDataTable;
-//         
-//         if (Word.StartsWith(ActiveWord, ESearchCase::IgnoreCase)) // Check if the word is in progress
-//         {
-//             FString HighlightedWord = FString::Printf(TEXT("<>%s</>"), *ActiveWord);
-//             StyledText = StyledText.LeftChop(ActiveWord.Len()) + HighlightedWord;
-//             break;
-//         }
-//     }
-//     
-//     
-//
-//     return StyledText;
-// }
-
 FString UUDSDialogueWidget::ApplyRichTextFormatting()
 {
     TArray<FUDSHoverKeywordRow*> KeywordRows = GetHoverKeywords();
@@ -95,36 +72,26 @@ FString UUDSDialogueWidget::ApplyRichTextFormatting()
         FString CleanWord = GetWordFromString(Word, Prefix, Postfix);
         int32 KeywordRowIndex = INDEX_NONE;
         bool IsHighlighted = false;
-        // Check if this word should be highlighted
-       // if(i != NumWords - 1)
-        {
-            //IsHighlighted = HighlightedWords.Contains(CleanWord);
-            KeywordRowIndex = HighlightedWords.IndexOfByKey(CleanWord);
-            IsHighlighted = KeywordRowIndex != INDEX_NONE;
-            //UE_LOG(LogTemp, Log, TEXT("CleanWord: %s, IsHighlighted: %s"), *CleanWord, IsHighlighted ? TEXT("true") : TEXT("false"));
-        }
+        KeywordRowIndex = HighlightedWords.IndexOfByKey(CleanWord);
+        IsHighlighted = KeywordRowIndex != INDEX_NONE;
         // If we are currently typing a word, check if it starts as a highlighted word
         if(i == NumWords - 1) // Last word is still being typed
         {
             FString LastPrefix;
             FString LastPostix;
             FString LastCleanWord = GetWordFromString(FullDialogueText.ToString(), LastPrefix, LastPostix, DialogueIndex);
-            //if(!LastCleanWord.Equals(CleanWord, ESearchCase::IgnoreCase))
             if(LastCleanWord.Len() > 0 && LastCleanWord != CleanWord)
             {
                 KeywordRowIndex = HighlightedWords.IndexOfByKey(LastCleanWord);
                 IsHighlighted = KeywordRowIndex != INDEX_NONE;
-                //UE_LOG(LogTemp, Log, TEXT("CleanWord: %s, LastCleanWord: %s, IsHighlighted: %s"), *CleanWord, *LastCleanWord, IsHighlighted ? TEXT("true") : TEXT("false"));
             }
-            //UE_LOG(LogTemp, Log, TEXT("LastPrefix: %s, LastCleanWord: %s, LastPostfix: %s"), *LastPrefix, *LastCleanWord, *LastPostix);
         }
-        //UE_LOG(LogTemp, Log, TEXT("Prefix: %s, CleanWord: %s, Postfix: %s"), *Prefix, *CleanWord, *Postfix);
         // Apply the appropriate formatting
         if (IsHighlighted) 
         {
             FString Style = KeywordRows[KeywordRowIndex]->StyleFromDataTable;
-            StyledText += FString::Printf(TEXT("%s<%s>%s</>%s "), *Prefix, *Style, *CleanWord, *Postfix);
-            //UE_LOG(LogTemp, Log, TEXT("StyledText: %s"), *StyledText);
+            //StyledText += FString::Printf(TEXT("<tooltip text=\"Some Infos\">%s</>"), *CleanWord);
+            StyledText += FString::Printf(TEXT("%s<Tooltip Text=\"Some Infos\">%s</>%s "), *Prefix, *CleanWord, *Postfix);
         }
         else
         {
@@ -137,7 +104,7 @@ FString UUDSDialogueWidget::ApplyRichTextFormatting()
 
 FString UUDSDialogueWidget::GetWordFromString(const FString& Text, FString& OutPrefix, FString& OutPostfix, int32 Index)
 {
-    if (Text.IsEmpty() || Index < 0 || Index >= Text.Len() || FChar::IsWhitespace(Text[Index]) || FChar::IsControl(Text[Index]))
+    if (Text.IsEmpty() || Index < 0 || Index >= Text.Len())
     {
         return TEXT(""); // Return empty if index is out of bounds
     }
@@ -147,9 +114,14 @@ FString UUDSDialogueWidget::GetWordFromString(const FString& Text, FString& OutP
     int32 PrefixIndex = Index;
     int32 PostfixIndex = 0;
 
+    bool bLetterFound = false;//The word can contain whitespace at the end
     //Find initial character of the word
-    while (PrefixIndex > 0 && !FChar::IsWhitespace(Text[PrefixIndex]) && !FChar::IsControl(Text[PrefixIndex]))
+    while (PrefixIndex > 0 && (!bLetterFound || !FChar::IsWhitespace(Text[PrefixIndex])))
     {
+        if(FChar::IsAlnum(Text[PrefixIndex]))
+        {
+            bLetterFound = true;
+        }
         PrefixIndex--;
     }
     
@@ -172,7 +144,7 @@ FString UUDSDialogueWidget::GetWordFromString(const FString& Text, FString& OutP
     PostfixIndex = WordEndIndex;
 
     //Find last character of the word
-    while(PostfixIndex < Text.Len() && !FChar::IsWhitespace(Text[PostfixIndex]) && !FChar::IsControl(Text[PrefixIndex]))
+    while(PostfixIndex < Text.Len() && !FChar::IsWhitespace(Text[PostfixIndex]))
     {
         PostfixIndex++;
     }
@@ -181,11 +153,10 @@ FString UUDSDialogueWidget::GetWordFromString(const FString& Text, FString& OutP
     OutPrefix = Text.Mid(PrefixIndex, WordStartIndex - PrefixIndex);
     OutPostfix = Text.Mid(WordEndIndex, PostfixIndex - WordEndIndex);
     FString ReturnText = Text.Mid(WordStartIndex, WordEndIndex - WordStartIndex);
-    UE_LOG(LogTemp, Log, TEXT("Prefix: %s, Word: %s, Postfix: %s"), *OutPrefix, *ReturnText, *OutPostfix);
+    //UE_LOG(LogTemp, Log, TEXT("Prefix: %s, Word: %s, Postfix: %s"), *OutPrefix, *ReturnText, *OutPostfix);
     return ReturnText;
 }
 
-//RichText.Emphasis
 void UUDSDialogueWidget::StartTypewriterEffect(float Rate)
 {
     bIsTypingFinished = false;
