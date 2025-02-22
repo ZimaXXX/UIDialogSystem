@@ -29,9 +29,6 @@ class UIDIALOGSYSTEM_API UUDSDialogueWidget : public UUserWidget
 public:
     UPROPERTY(BlueprintAssignable, Category = "Dialogue")
     FOnTypingFinishedDelegate OnTypingFinishedDelegate;
-    
-
-
     UFUNCTION(BlueprintCallable, Category = "Dialogue")
     void SetDialogue(const FUDSDialogueEntry& DialogueEntry);
     FString ApplyRichTextFormatting();
@@ -77,6 +74,7 @@ private:
     void OnKeywordUnhovered();
 
     bool bIsTypingFinished = true;
+    TArray<FUDSHoverKeywordRow*> CachedKeywords;
 
     UFUNCTION()
     void OnTypingFinished();

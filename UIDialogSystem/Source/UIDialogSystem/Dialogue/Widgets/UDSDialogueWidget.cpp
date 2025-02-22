@@ -42,9 +42,14 @@ void UUDSDialogueWidget::SetDialogue(const FUDSDialogueEntry& DialogueEntry)
 
 TArray<FUDSHoverKeywordRow*> UUDSDialogueWidget::GetHoverKeywords()
 {
+    if(CachedKeywords.Num() > 0)
+    {
+        return CachedKeywords;
+    }
     TArray<FUDSHoverKeywordRow*> KeywordRows;
     FString ContextString;
     KeywordsDataTable->GetAllRows<FUDSHoverKeywordRow>(TEXT(""), KeywordRows);
+    CachedKeywords = KeywordRows;
     return KeywordRows;
 }
 
@@ -100,7 +105,7 @@ FString UUDSDialogueWidget::AppendRichTextFormatting(FString CurrentFormattedStr
             CurrentTagStartIndex = INDEX_NONE;
         }
        
-        StyledText += FString::Printf(TEXT("%s<Tooltip Text=\"%s\">%s</>%s"), *LastPrefix, *KeywordRows[KeywordRowIndex]->Description.ToString(), *LastCleanWord, *LastPostix);
+        StyledText += FString::Printf(TEXT("%s<Tooltip TTDesc=\"%s\">%s</>%s"), *LastPrefix, *KeywordRows[KeywordRowIndex]->Description.ToString(), *LastCleanWord, *LastPostix);
     }
     else
     {
@@ -154,7 +159,7 @@ FString UUDSDialogueWidget::ApplyRichTextFormatting()
         {
             FString Style = KeywordRows[KeywordRowIndex]->StyleFromDataTable;
             //StyledText += FString::Printf(TEXT("<tooltip text=\"Some Infos\">%s</>"), *CleanWord);
-            StyledText += FString::Printf(TEXT("%s<Tooltip Text=\"%s\">%s</>%s "), *Prefix, *KeywordRows[KeywordRowIndex]->Description.ToString(), *CleanWord, *Postfix);
+            StyledText += FString::Printf(TEXT("%s<Tooltip TTDesc=\"%s\">%s</>%s "), *Prefix, *KeywordRows[KeywordRowIndex]->Description.ToString(), *CleanWord, *Postfix);
         }
         else
         {

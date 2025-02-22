@@ -20,7 +20,7 @@ public:
 	// Only valid if text is: <tooltip text="Some infos">Some text</>
 	virtual bool Supports(const FTextRunParseResults& RunParseResult, const FString& Text) const override
 	{
-		return RunParseResult.Name == TEXT("tooltip") && RunParseResult.MetaData.Contains(TEXT("text"));
+		return RunParseResult.Name == TEXT("tooltip") && RunParseResult.MetaData.Contains(TEXT("ttdesc"));
 	}
 
 protected:
@@ -30,11 +30,15 @@ protected:
 	 * For <Tooltip Text="MyTooltipDescription">MyWord</>:
 	 * - RunInfo.Content is "MyWord"
 	 * - RunInfo.MetaData[TEXT("text")] is "MyTooltipDescription"
+	 *
+	 * Optimization - Caching Tooltips
+	 * RichTextBlock is updated with each typed letter which recreated the tooltip widget each time.
+	 * Tooltip Description is checked instead of Word as Word grows until reaching the end ("Scene" is "S", "Sc", "Sce", "Scen", "Scene") but Tooltip Description remains the same.
 	 */
 	virtual TSharedPtr<SWidget> CreateDecoratorWidget(const FTextRunInfo& InRunInfo, const FTextBlockStyle& InTextStyle) const override
 	{
 		// Check if we already created a widget for this RunInfo
-		const FString& CurrentText = InRunInfo.MetaData[TEXT("text")];
+		const FString& CurrentText = InRunInfo.MetaData[TEXT("ttdesc")];
 		TSharedPtr<IToolTip> CachedWidget;
 		for (TSharedPtr<IToolTip> TempCachedWidget : CachedWidgets)
 		{
