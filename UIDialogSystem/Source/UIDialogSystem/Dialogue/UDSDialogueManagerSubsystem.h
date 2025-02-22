@@ -6,6 +6,9 @@
 #include "UDSDialogueManagerSubsystem.generated.h"
 
 class UUDSDialogueDataAsset;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDialogueWidgetCreated, UUDSDialogueWidget*, DialogueWidget);
+
 // Subsystem class for managing dialogue sequences
 UCLASS()
 class UIDIALOGSYSTEM_API UUDSDialogueManagerSubsystem : public UGameInstanceSubsystem
@@ -19,7 +22,10 @@ private:
 public:
 	// Constructor for the dialogue manager subsystem
 	UUDSDialogueManagerSubsystem();
-
+	
+	UPROPERTY(BlueprintAssignable, Category = "Dialogue")
+	FOnDialogueWidgetCreated OnDialogueWidgetCreatedDelegate;
+	
 	UFUNCTION(BlueprintCallable, Category = "Dialogue")
 	void Init(TSubclassOf<class UUDSDialogueWidget> InDialogueWidgetClass, UDataTable* InHoverKeywordsDataTable);
 
@@ -30,14 +36,14 @@ public:
 	// The hover keywords data table
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Keywords")
 	UDataTable* HoverKeywordsDataTable;
+
+	// Currently active dialogue widget
+	UPROPERTY(BlueprintReadOnly, Category = "Dialogue")
+	UUDSDialogueWidget* CurrentDialogueWidget;
 private:
 	// Class of the dialogue widget to be used
 	UPROPERTY(EditAnywhere, Category = "Dialogue")
 	TSubclassOf<class UUDSDialogueWidget> DialogueWidgetClass;
-
-	// Currently active dialogue widget
-	UPROPERTY()
-	UUDSDialogueWidget* CurrentDialogueWidget;
 
 	// Queue of dialogue entries to be displayed
 	TArray<FUDSDialogueEntry> DialogueQueue;

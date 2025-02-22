@@ -257,6 +257,7 @@ void UUDSDialogueWidget::UpdateTypewriterEffect()
         //FString FormattedString = ApplyRichTextFormatting();
         DialogueRichText->SetText(FText::FromString(FormattedString));
         DialogueIndex++;
+        OnRichTextUpdatedDelegate.Broadcast();
     }
     else
     {
@@ -264,6 +265,7 @@ void UUDSDialogueWidget::UpdateTypewriterEffect()
         FString FormattedString = ApplyRichTextFormatting();
         DialogueRichText->SetText(FText::FromString(FormattedString));
         GetWorld()->GetTimerManager().ClearTimer(TypewriterTimerHandle);
+        OnRichTextUpdatedDelegate.Broadcast();
         OnTypingFinished();
     }
 }

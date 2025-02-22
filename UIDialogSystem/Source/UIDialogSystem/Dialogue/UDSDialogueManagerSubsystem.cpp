@@ -39,7 +39,8 @@ void UUDSDialogueManagerSubsystem::ShowNextDialogue()
             {
                 CurrentDialogueWidget = CreateWidget<UUDSDialogueWidget>(GetWorld(), DialogueWidgetClass);
                 CurrentDialogueWidget->KeywordsDataTable = HoverKeywordsDataTable;
-                CurrentDialogueWidget->AddToViewport();
+                OnDialogueWidgetCreatedDelegate.Broadcast(CurrentDialogueWidget);
+                //CurrentDialogueWidget->AddToViewport();
                 //CurrentDialogueWidget->OnTypingFinishedDelegate.AddDynamic(this, &UUDSDialogueManagerSubsystem::ShowNextDialogue);
             }
         }

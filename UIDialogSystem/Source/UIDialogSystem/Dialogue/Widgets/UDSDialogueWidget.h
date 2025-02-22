@@ -6,6 +6,7 @@
 
 struct FUDSHoverKeywordRow;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTypingFinishedDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRichTextUpdated);
 
 class UUDSCharacterConfigDataAsset;
 
@@ -29,6 +30,10 @@ class UIDIALOGSYSTEM_API UUDSDialogueWidget : public UUserWidget
 public:
     UPROPERTY(BlueprintAssignable, Category = "Dialogue")
     FOnTypingFinishedDelegate OnTypingFinishedDelegate;
+
+    UPROPERTY(BlueprintAssignable, Category = "Dialogue")
+    FOnRichTextUpdated OnRichTextUpdatedDelegate;
+    
     UFUNCTION(BlueprintCallable, Category = "Dialogue")
     void SetDialogue(const FUDSDialogueEntry& DialogueEntry);
     FString ApplyRichTextFormatting();
@@ -48,16 +53,16 @@ public:
 
     UPROPERTY()
     UDataTable* KeywordsDataTable;
-private:
-    UPROPERTY(meta = (BindWidget))
+
+    UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
     class UImage* CharacterImage;
 
-    UPROPERTY(meta = (BindWidget))
+    UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
     class UTextBlock* CharacterNameText;
 
-    UPROPERTY(meta = (BindWidget))
+    UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
     class URichTextBlock* DialogueRichText;
-
+private:
     FText FullDialogueText;
     FString CurrentDialogueString;
     int32 DialogueIndex = 0;
