@@ -27,67 +27,46 @@ protected:
 	/**
 	 * Create a STextBlock with a tooltip text.
 	 * 
-	 * For <Tooltip Text="Some infos">Some text</>:
-	 * - RunInfo.Content is "Some text"
-	 * - RunInfo.MetaData[TEXT("text")] is "Some infos"
+	 * For <Tooltip Text="MyTooltipDescription">MyWord</>:
+	 * - RunInfo.Content is "MyWord"
+	 * - RunInfo.MetaData[TEXT("text")] is "MyTooltipDescription"
 	 */
 	virtual TSharedPtr<SWidget> CreateDecoratorWidget(const FTextRunInfo& InRunInfo, const FTextBlockStyle& InTextStyle) const override
 	{
 		// Check if we already created a widget for this RunInfo
+		const FString& CurrentText = InRunInfo.MetaData[TEXT("text")];
+		TSharedPtr<IToolTip> CachedWidget;
+		for (TSharedPtr<IToolTip> TempCachedWidget : CachedWidgets)
+		{
+			if(TempCachedWidget.Get() && StaticCastSharedRef<STextBlock>(TempCachedWidget->GetContentWidget()).Get().GetText().ToString() == CurrentText)
+			{
+				CachedWidget = TempCachedWidget;
+			}
+		}
+
+		//Create mew Tooltip and Cache it
 		if(!CachedWidget.Get())
 		{
-			CachedWidget = SNew(SToolTip);	
-		}
-		if(InRunInfo.MetaData[TEXT("text")] != LastTooltipText)
-		{
-			CachedWidget = SNew(SToolTip);	
+			CachedWidget = SNew(SToolTip);
+			CachedWidgets.AddUnique(CachedWidget);
+
+			// Update the tooltip text if it has changed
 			CachedWidget->SetContentWidget(
 				SNew(STextBlock)
-				.Text(FText::FromString(InRunInfo.MetaData[TEXT("text")]))
+				.Text(FText::FromString(CurrentText))
 				.TextStyle(&TooltipTextStyle));
 		}
-
-		LastTooltipText = InRunInfo.MetaData[TEXT("text")];
-		// TSharedRef<STextBlock> TooltipTextBlock = StaticCastSharedRef<STextBlock>(CachedWidget->GetContentWidget());// static_cast< STextBlock* >(Tooltip->GetContentWidget().Get());
-		// TooltipTextBlock->SetText(FText::FromString(InRunInfo.MetaData[TEXT("text")]));
-		// TooltipTextBlock->SetTextStyle(&TooltipTextStyle);
-
 		
 		return SNew(STextBlock)
 		.Text(InRunInfo.Content)
 		.TextStyle(&TextStyle)
-		.ToolTip(CachedWidget);
-		
-		// if (!CachedWidget.Get())
-		// {		
-		// 	CachedWidget = SNew(STextBlock)
-		// 	.Text(InRunInfo.Content)
-		// 	.TextStyle(&TextStyle)
-		// 	.ToolTip(SNew(SToolTip)
-		// 	[
-		// 		SNew(STextBlock)
-		// 		.Text(FText::FromString(InRunInfo.MetaData[TEXT("text")]))
-		// 		.TextStyle(&TooltipTextStyle)
-		// 	]);		
-		// }
-		// else
-		// {
-		// 	STextBlock* TextBlock = CachedWidget.Get();
-		// 	TextBlock->SetText(InRunInfo.Content);
-  //           TextBlock->SetTextStyle(&TextStyle);
-		// 	TSharedPtr<IToolTip> Tooltip = TextBlock->GetToolTip();
-		// 	TSharedRef<STextBlock> TooltipTextBlock = StaticCastSharedRef<STextBlock>(Tooltip->GetContentWidget());// static_cast< STextBlock* >(Tooltip->GetContentWidget().Get());
-		// 	TooltipTextBlock->SetText(FText::FromString(InRunInfo.MetaData[TEXT("text")]));
-		// 	TooltipTextBlock->SetTextStyle(&TooltipTextStyle);
-		// }
-		// return CachedWidget;
+		.ToolTip(CachedWidget);		
 	}
 
 private:
 	FTextBlockStyle TextStyle;
 	FTextBlockStyle TooltipTextStyle;
-	mutable TSharedPtr<IToolTip> CachedWidget;
-	mutable FString LastTooltipText;
+	mutable TArray<TSharedPtr<IToolTip>> CachedWidgets;
 };
 
 // UUDSRichTextBlockDecorator
