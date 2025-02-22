@@ -27,12 +27,13 @@ protected:
 	/**
 	 * Create a STextBlock with a tooltip text.
 	 * 
-	 * For <Tooltip Text="MyTooltipDescription">MyWord</>:
+	 * For <Tooltip TTDesc="MyTooltipDescription">MyWord</>:
 	 * - RunInfo.Content is "MyWord"
 	 * - RunInfo.MetaData[TEXT("text")] is "MyTooltipDescription"
 	 *
 	 * Optimization - Caching Tooltips
-	 * RichTextBlock is updated with each typed letter which recreated the tooltip widget each time.
+	 * RichTextBlock is updated with each typed letter which recreates the Decorator and the Tooltip widget each time.
+	 * Tooltips are now cached to avoid recreating them each time.
 	 * Tooltip Description is checked instead of Word as Word grows until reaching the end ("Scene" is "S", "Sc", "Sce", "Scen", "Scene") but Tooltip Description remains the same.
 	 */
 	virtual TSharedPtr<SWidget> CreateDecoratorWidget(const FTextRunInfo& InRunInfo, const FTextBlockStyle& InTextStyle) const override
