@@ -59,18 +59,18 @@ FString UUDSDialogueWidget::AppendRichTextFormatting(FString CurrentFormattedStr
     FString AdaptedFormattedDialogueString = {};
     if(CurrentTagStartIndex != INDEX_NONE)
     {
-        AdaptedFormattedDialogueString = CurrentFormattedString.Mid(CurrentTagStartIndex,  CurrentTagStartIndex);
+        AdaptedFormattedDialogueString = CurrentFormattedString.Mid(0,  CurrentTagStartIndex);
     }
     else
     {
         //return &CurrentDialogueString[DialogueIndex];
         AdaptedFormattedDialogueString = CurrentFormattedString;
     }    
-
-    if(FChar::IsWhitespace(CurrentDialogueString[DialogueIndex]))
+    TCHAR CurrentLetter = CurrentDialogueString[DialogueIndex];
+    if(FChar::IsWhitespace(CurrentLetter) || FChar::IsPunct(CurrentLetter))
     {
         CurrentTagStartIndex = INDEX_NONE;
-        return CurrentFormattedString + CurrentDialogueString[DialogueIndex];
+        return CurrentFormattedString + CurrentLetter;
     }
     
     FString Prefix;
@@ -78,8 +78,6 @@ FString UUDSDialogueWidget::AppendRichTextFormatting(FString CurrentFormattedStr
     FString LastPrefix;
     FString LastPostix;
     FString CleanWord = GetWordFromString(FullDialogueText.ToString(), Prefix, Postfix, DialogueIndex);
-    FString Temp = AdaptedFormattedDialogueString;
-    Temp.AppendChar(CurrentDialogueString[DialogueIndex]);
     FString LastCleanWord = GetWordFromString(CurrentDialogueString, LastPrefix, LastPostix, DialogueIndex);
     int32 KeywordRowIndex = INDEX_NONE;
     bool bIsHighlighted = false;
@@ -181,16 +179,24 @@ FString UUDSDialogueWidget::GetWordFromString(const FString& Text, FString& OutP
 
     bool bLetterFound = false;//The word can contain whitespace at the end
     //Find initial character of the word
-    while (PrefixIndex > 0 && (!bLetterFound || !FChar::IsWhitespace(Text[PrefixIndex])))
+    
+    while (PrefixIndex >= 0)
     {
-        if(FChar::IsAlnum(Text[PrefixIndex]))
+        TCHAR CurrentLetter = Text[PrefixIndex];
+        if(bLetterFound && (FChar::IsWhitespace(CurrentLetter) || FChar::IsPunct(CurrentLetter)))//If we found non-letter character don't include it in word
+        //if(bLetterFound && FChar::IsWhitespace(CurrentLetter))//If we found non-letter character don't include it in word
         {
-            bLetterFound = true;
+            PrefixIndex++;
+            break;
         }
-        PrefixIndex--;
+        if(!bLetterFound && FChar::IsAlnum(CurrentLetter))
+        {
+            bLetterFound = true;            
+        }
+        PrefixIndex--;        
     }
     
-    WordStartIndex = PrefixIndex;
+    WordStartIndex = FMath::Max(PrefixIndex, 0);
 
     //Find initial letter of the word
     while(WordStartIndex < Text.Len() && !FChar::IsAlnum(Text[WordStartIndex]))
