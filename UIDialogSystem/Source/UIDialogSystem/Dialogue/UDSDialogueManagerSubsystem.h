@@ -11,7 +11,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDialogueWidgetCreated, UUDSDialog
 
 // Subsystem class for managing dialogue sequences
 UCLASS()
-class UIDIALOGSYSTEM_API UUDSDialogueManagerSubsystem : public UGameInstanceSubsystem
+class UIDIALOGSYSTEM_API UUDSDialogueManagerSubsystem : public UWorldSubsystem
 {
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
