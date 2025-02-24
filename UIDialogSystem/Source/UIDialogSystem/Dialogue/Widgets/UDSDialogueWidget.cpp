@@ -2,6 +2,7 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Components/RichTextBlock.h"
+#include "Components/ScrollBox.h"
 #include "UIDialogSystem/Dialogue/Data/UDSCharacterConfigDataAsset.h"
 #include "UIDialogSystem/Dialogue/Data/UDSHoverKeywordRow.h"
 
@@ -32,6 +33,11 @@ void UUDSDialogueWidget::SetDialogue(const FUDSDialogueEntry& DialogueEntry)
     if (DialogueRichText)
     {
         DialogueRichText->SetText(FText::GetEmpty());
+    }
+
+    if(ScrollBox)
+    {
+        ScrollBox->ScrollToStart();//require to fix scroll offset after switching dialogue
     }
 
     FullDialogueText = DialogueEntry.DialogueText;
@@ -245,6 +251,25 @@ void UUDSDialogueWidget::SkipTypewriterEffect()
     if (DialogueRichText) DialogueRichText->SetText(FullDialogueText);
     DialogueIndex = FullDialogueText.ToString().Len();
     UpdateTypewriterEffect();
+}
+
+bool UUDSDialogueWidget::IsScrolledToEnd()
+{
+    if(ScrollBox)
+    {
+        float Offset = ScrollBox->GetScrollOffset();
+        float OffsetToEnd = ScrollBox->GetScrollOffsetOfEnd();
+        return Offset == OffsetToEnd;
+    }
+    return false;
+}
+
+void UUDSDialogueWidget::ScrollToEnd()
+{
+    if(ScrollBox)
+    {
+        return ScrollBox->ScrollToEnd();
+    }
 }
 
 void UUDSDialogueWidget::UpdateTypewriterEffect()

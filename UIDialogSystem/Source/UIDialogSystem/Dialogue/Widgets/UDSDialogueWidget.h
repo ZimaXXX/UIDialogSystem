@@ -45,6 +45,12 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Dialogue")
     void SkipTypewriterEffect();
 
+    UFUNCTION(BlueprintPure, Category = "Dialogue")
+    bool IsScrolledToEnd();
+
+    UFUNCTION(BlueprintCallable, Category = "Dialogue")
+    void ScrollToEnd();
+
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Typewriter")
     float TypingRate = 0.05f;
 
@@ -62,6 +68,9 @@ public:
 
     UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
     class URichTextBlock* DialogueRichText;
+    
+    UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+    class UScrollBox* ScrollBox;
 private:
     FText FullDialogueText;
     FString CurrentDialogueString;

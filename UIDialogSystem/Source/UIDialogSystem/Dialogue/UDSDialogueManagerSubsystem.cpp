@@ -40,8 +40,6 @@ void UUDSDialogueManagerSubsystem::ShowNextDialogue()
                 CurrentDialogueWidget = CreateWidget<UUDSDialogueWidget>(GetWorld(), DialogueWidgetClass);
                 CurrentDialogueWidget->KeywordsDataTable = HoverKeywordsDataTable;
                 OnDialogueWidgetCreatedDelegate.Broadcast(CurrentDialogueWidget);
-                //CurrentDialogueWidget->AddToViewport();
-                //CurrentDialogueWidget->OnTypingFinishedDelegate.AddDynamic(this, &UUDSDialogueManagerSubsystem::ShowNextDialogue);
             }
         }
 
@@ -62,6 +60,10 @@ void UUDSDialogueManagerSubsystem::SkipCurrentDialogue()
     if(!CurrentDialogueWidget->IsTypingFinished())
     {
         CurrentDialogueWidget->SkipTypewriterEffect();
+    }
+    else if(!CurrentDialogueWidget->IsScrolledToEnd())
+    {
+        CurrentDialogueWidget->ScrollToEnd();
     }
     else
     {
