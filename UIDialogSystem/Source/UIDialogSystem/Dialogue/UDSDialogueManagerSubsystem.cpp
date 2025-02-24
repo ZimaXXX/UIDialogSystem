@@ -12,11 +12,20 @@ UUDSDialogueManagerSubsystem::UUDSDialogueManagerSubsystem()
 {
 }
 
+void UUDSDialogueManagerSubsystem::HandleCultureChanged()
+{
+    if (CurrentDialogueWidget)
+    {
+        CurrentDialogueWidget->SetDialogue(DialogueQueue[CurrentDialogueIndex]);
+    }
+}
+
 void UUDSDialogueManagerSubsystem::Init(TSubclassOf<class UUDSDialogueWidget> InDialogueWidgetClass,
-    UDataTable* InHoverKeywordsDataTable)
+                                        UDataTable* InHoverKeywordsDataTable)
 {
     DialogueWidgetClass = InDialogueWidgetClass;
     HoverKeywordsDataTable = InHoverKeywordsDataTable;
+    FInternationalization::Get().OnCultureChanged().AddUObject(this, &UUDSDialogueManagerSubsystem::HandleCultureChanged);
 }
 
 void UUDSDialogueManagerSubsystem::StartDialogue(UUDSDialogueDataAsset* DialogueDataAsset)
@@ -24,7 +33,7 @@ void UUDSDialogueManagerSubsystem::StartDialogue(UUDSDialogueDataAsset* Dialogue
     if (DialogueDataAsset)
     {
         DialogueQueue = DialogueDataAsset->DialogueEntries;
-        CurrentDialogueIndex = 0;
+        CurrentDialogueIndex = -1;
         ShowNextDialogue();
     }
 }
@@ -45,8 +54,8 @@ void UUDSDialogueManagerSubsystem::ShowNextDialogue()
 
         if (CurrentDialogueWidget)
         {
-            CurrentDialogueWidget->SetDialogue(DialogueQueue[CurrentDialogueIndex]);
             CurrentDialogueIndex++;
+            CurrentDialogueWidget->SetDialogue(DialogueQueue[CurrentDialogueIndex]);
         }
     }
 }

@@ -25,7 +25,8 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category = "Dialogue")
 	FOnDialogueWidgetCreated OnDialogueWidgetCreatedDelegate;
-	
+
+	void HandleCultureChanged();
 	UFUNCTION(BlueprintCallable, Category = "Dialogue")
 	void Init(TSubclassOf<class UUDSDialogueWidget> InDialogueWidgetClass, UDataTable* InHoverKeywordsDataTable);
 
@@ -49,7 +50,7 @@ private:
 	TArray<FUDSDialogueEntry> DialogueQueue;
 
 	// Index of the current dialogue entry being displayed
-	int32 CurrentDialogueIndex;
+	int32 CurrentDialogueIndex = -1;
 
 	UFUNCTION()
 	void ShowNextDialogue();
