@@ -40,7 +40,7 @@ void UUDSDialogueManagerSubsystem::StartDialogue(UUDSDialogueDataAsset* Dialogue
 
 void UUDSDialogueManagerSubsystem::ShowNextDialogue()
 {
-    if (CurrentDialogueIndex < DialogueQueue.Num())
+    if (CurrentDialogueIndex < DialogueQueue.Num() - 1)
     {
         if (!CurrentDialogueWidget)//caching widget for performance
         {
