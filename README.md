@@ -1,5 +1,7 @@
 # Monkey Island Style Dialogue System
 
+![Dialogue Preview](Images/Preview.gif)
+
 ## Project Overview
 
 This project implements a Monkey Island-style dialogue system using Unreal Engine 5.5 and UMG widgets. It features:
@@ -13,8 +15,6 @@ This project implements a Monkey Island-style dialogue system using Unreal Engin
 - A scrollable text box for longer dialogue
 - Multiple speakers with only one widget visible at a time
 - Black background focus for an immersive dialogue experience
-
-![Dialogue Preview](Images/Preview.gif)
 
 ## Features
 
