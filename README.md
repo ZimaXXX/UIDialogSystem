@@ -50,6 +50,13 @@ This project implements a Monkey Island-style dialogue system using Unreal Engin
 - `URichTextBlock` → Supports text highlighting & tooltips
 - `ScrollBox` → Handles text overflow properly
 
+### Optimizations
+- Only single instance of WBP_DialogueWidget is used
+- Typing letters with formatting is done by 2 algorithms
+  - AppendRichTextFormatting - optimized for appending single letter
+  - ApplyRichTextFormatting - optimized for formatting full text
+- Decorator has Tooltip widgets Cached to mitigate blinking of Tooltip on each RichTextBlock refresh (each letter typed)
+
 ## Installation & Setup
 
 ### Prerequisites
