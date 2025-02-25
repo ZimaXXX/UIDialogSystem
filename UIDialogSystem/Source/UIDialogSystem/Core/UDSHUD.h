@@ -3,15 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
-#include "UDSGameMode.generated.h"
+#include "GameFramework/HUD.h"
+#include "UDSHUD.generated.h"
 
-class UUDSDialogueDataAsset;
 /**
  * 
  */
 UCLASS()
-class UIDIALOGSYSTEM_API AUDSGameMode : public AGameModeBase
+class UIDIALOGSYSTEM_API AUDSHUD : public AHUD
 {
 	GENERATED_BODY()
+
 };
