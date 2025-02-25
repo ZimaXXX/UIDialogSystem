@@ -12,11 +12,7 @@ struct FUDSHoverKeywordRow : public FTableRowBase
 	// The keyword
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Keywords")
 	FText Keyword;
-
-	// The color for the keyword
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Keywords")
-	FString StyleFromDataTable;
-
+	
 	// The description for the keyword
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Keywords")
 	FText Description;

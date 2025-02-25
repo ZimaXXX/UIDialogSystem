@@ -58,7 +58,9 @@ TArray<FUDSHoverKeywordRow*> UUDSDialogueWidget::GetHoverKeywords()
     CachedKeywords = KeywordRows;
     return KeywordRows;
 }
-
+/* 
+    Algorithm takes formatted text, finds last formatted (with braces and tags) word (or part of the word) and overwrites only that part by adding new letter.
+ */
 FString UUDSDialogueWidget::AppendRichTextFormatting(FString CurrentFormattedString)
 {
     TArray<FUDSHoverKeywordRow*> KeywordRows = GetHoverKeywords();
@@ -100,8 +102,6 @@ FString UUDSDialogueWidget::AppendRichTextFormatting(FString CurrentFormattedStr
     FString StyledText = AdaptedFormattedDialogueString; // Build the formatted text dynamically
     if (bIsHighlighted) 
     {
-        FString Style = KeywordRows[KeywordRowIndex]->StyleFromDataTable;
-        //StyledText += FString::Printf(TEXT("<tooltip text=\"Some Infos\">%s</>"), *CleanWord);
         if(CleanWord != LastCleanWord)
         {
             CurrentTagStartIndex = AdaptedFormattedDialogueString.Len();
@@ -122,6 +122,9 @@ FString UUDSDialogueWidget::AppendRichTextFormatting(FString CurrentFormattedStr
     return StyledText;
 }
 
+/* 
+    Algorithm takes unformatted text and applies formatting to every recognized word or part of the word.
+ */
 FString UUDSDialogueWidget::ApplyRichTextFormatting()
 {
     TArray<FUDSHoverKeywordRow*> KeywordRows = GetHoverKeywords();
@@ -163,8 +166,6 @@ FString UUDSDialogueWidget::ApplyRichTextFormatting()
         // Apply the appropriate formatting
         if (IsHighlighted) 
         {
-            FString Style = KeywordRows[KeywordRowIndex]->StyleFromDataTable;
-            //StyledText += FString::Printf(TEXT("<tooltip text=\"Some Infos\">%s</>"), *CleanWord);
             StyledText += FString::Printf(TEXT("%s<Tooltip TTDesc=\"%s\">%s</>%s "), *Prefix, *KeywordRows[KeywordRowIndex]->Description.ToString(), *CleanWord, *Postfix);
         }
         else
@@ -189,13 +190,12 @@ FString UUDSDialogueWidget::GetWordFromString(const FString& Text, FString& OutP
     int32 PostfixIndex = 0;
 
     bool bLetterFound = false;//The word can contain whitespace at the end
-    //Find initial character of the word
     
+    //Find initial character of the word    
     while (PrefixIndex >= 0)
     {
         TCHAR CurrentLetter = Text[PrefixIndex];
         if(bLetterFound && (FChar::IsWhitespace(CurrentLetter) || FChar::IsPunct(CurrentLetter)))//If we found non-letter character don't include it in word
-        //if(bLetterFound && FChar::IsWhitespace(CurrentLetter))//If we found non-letter character don't include it in word
         {
             PrefixIndex++;
             break;
@@ -235,7 +235,6 @@ FString UUDSDialogueWidget::GetWordFromString(const FString& Text, FString& OutP
     OutPrefix = Text.Mid(PrefixIndex, WordStartIndex - PrefixIndex);
     OutPostfix = Text.Mid(WordEndIndex, PostfixIndex - WordEndIndex);
     FString ReturnText = Text.Mid(WordStartIndex, WordEndIndex - WordStartIndex);
-    //UE_LOG(LogTemp, Log, TEXT("Prefix: %s, Word: %s, Postfix: %s"), *OutPrefix, *ReturnText, *OutPostfix);
     return ReturnText;
 }
 
@@ -272,6 +271,11 @@ void UUDSDialogueWidget::ScrollToEnd()
     }
 }
 
+void UUDSDialogueWidget::Init(const TObjectPtr<UDataTable>& InKeywordsDataTable)
+{
+    KeywordsDataTable = InKeywordsDataTable;
+}
+
 void UUDSDialogueWidget::UpdateTypewriterEffect()
 {
     if (DialogueIndex < FullDialogueText.ToString().Len())
@@ -279,7 +283,6 @@ void UUDSDialogueWidget::UpdateTypewriterEffect()
         CurrentDialogueString += FullDialogueText.ToString()[DialogueIndex];
         FString FormattedString = DialogueRichText->GetText().ToString();
         FormattedString = AppendRichTextFormatting(FormattedString);
-        //FString FormattedString = ApplyRichTextFormatting();
         DialogueRichText->SetText(FText::FromString(FormattedString));
         DialogueIndex++;
         OnRichTextUpdatedDelegate.Broadcast();
@@ -293,30 +296,6 @@ void UUDSDialogueWidget::UpdateTypewriterEffect()
         OnRichTextUpdatedDelegate.Broadcast();
         OnTypingFinished();
     }
-}
-
-FString UUDSDialogueWidget::GetCurrentlyTypedWord()
-{
-    FString ProcessedText = CurrentDialogueString.TrimStartAndEnd();
-    int32 LastSpaceIndex;
-
-    if (ProcessedText.FindLastChar(' ', LastSpaceIndex))
-    {
-        return ProcessedText.Mid(LastSpaceIndex + 1); // Extract last word
-    }
-    return ProcessedText; // If no space found, return the full typed text
-}
-
-void UUDSDialogueWidget::OnKeywordHovered(const FText& Keyword)
-{
-    if (FullDialogueText.ToString().Contains(Keyword.ToString()))
-    {
-        UE_LOG(LogTemp, Log, TEXT("Hovered Keyword: %s"), *Keyword.ToString());
-    }
-}
-
-void UUDSDialogueWidget::OnKeywordUnhovered()
-{
 }
 
 void UUDSDialogueWidget::OnTypingFinished()

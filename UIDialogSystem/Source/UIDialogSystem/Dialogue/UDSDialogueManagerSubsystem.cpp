@@ -14,7 +14,7 @@ UUDSDialogueManagerSubsystem::UUDSDialogueManagerSubsystem()
 
 void UUDSDialogueManagerSubsystem::HandleCultureChanged()
 {
-    if (CurrentDialogueWidget)
+    if (CurrentDialogueWidget)//rewrite current dialogue in updated language
     {
         CurrentDialogueWidget->SetDialogue(DialogueQueue[CurrentDialogueIndex]);
     }
@@ -42,12 +42,12 @@ void UUDSDialogueManagerSubsystem::ShowNextDialogue()
 {
     if (CurrentDialogueIndex < DialogueQueue.Num())
     {
-        if (!CurrentDialogueWidget)
+        if (!CurrentDialogueWidget)//caching widget for performance
         {
             if (DialogueWidgetClass)
             {
                 CurrentDialogueWidget = CreateWidget<UUDSDialogueWidget>(GetWorld(), DialogueWidgetClass);
-                CurrentDialogueWidget->KeywordsDataTable = HoverKeywordsDataTable;
+                CurrentDialogueWidget->Init(HoverKeywordsDataTable);
                 OnDialogueWidgetCreatedDelegate.Broadcast(CurrentDialogueWidget);
             }
         }
@@ -66,15 +66,15 @@ void UUDSDialogueManagerSubsystem::SkipCurrentDialogue()
     {
         return;
     }
-    if(!CurrentDialogueWidget->IsTypingFinished())
+    if(!CurrentDialogueWidget->IsTypingFinished())//if still typing, finish it
     {
         CurrentDialogueWidget->SkipTypewriterEffect();
     }
-    else if(!CurrentDialogueWidget->IsScrolledToEnd())
+    else if(!CurrentDialogueWidget->IsScrolledToEnd())//if not scrolled to end, scroll to end
     {
         CurrentDialogueWidget->ScrollToEnd();
     }
-    else
+    else//if scrolled to end, show next dialogue
     {
         ShowNextDialogue();
     }

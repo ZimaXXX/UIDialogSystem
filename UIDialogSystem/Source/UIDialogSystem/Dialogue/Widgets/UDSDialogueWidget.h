@@ -28,16 +28,16 @@ class UIDIALOGSYSTEM_API UUDSDialogueWidget : public UUserWidget
     GENERATED_BODY()
 
 public:
+    //delegates
     UPROPERTY(BlueprintAssignable, Category = "Dialogue")
     FOnTypingFinishedDelegate OnTypingFinishedDelegate;
 
     UPROPERTY(BlueprintAssignable, Category = "Dialogue")
     FOnRichTextUpdated OnRichTextUpdatedDelegate;
-    
+
+    //methods
     UFUNCTION(BlueprintCallable, Category = "Dialogue")
     void SetDialogue(const FUDSDialogueEntry& DialogueEntry);
-    FString ApplyRichTextFormatting();
-    FString GetWordFromString(const FString& Text, FString& OutPrefix, FString& OutPostfix, int32 Index = 0);
 
     UFUNCTION(BlueprintCallable, Category = "Dialogue")
     void StartTypewriterEffect(float Rate);
@@ -51,15 +51,16 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Dialogue")
     void ScrollToEnd();
 
-    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Typewriter")
-    float TypingRate = 0.05f;
-
     UFUNCTION(BlueprintPure)
     bool IsTypingFinished() const { return bIsTypingFinished;}
 
-    UPROPERTY()
-    UDataTable* KeywordsDataTable;
+    void Init(const TObjectPtr<UDataTable>& InKeywordsDataTable);
 
+    //variables    
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Config")
+    float TypingRate = 0.05f;
+
+    //widget bindings
     UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
     class UImage* CharacterImage;
 
@@ -71,28 +72,35 @@ public:
     
     UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
     class UScrollBox* ScrollBox;
-private:
+    
+protected:
+    //methods
+    void UpdateTypewriterEffect();
+    UFUNCTION()
+    void OnTypingFinished();
+    
+    //obtain keywords from DataTable. Cached for optimization
+    TArray<FUDSHoverKeywordRow*> GetHoverKeywords();
+    
+    //method optimized for adding single letter and retain formatting
+    FString AppendRichTextFormatting(FString CurrentFormattedString);
+
+    //method optimized to format whole dialogue text
+    FString ApplyRichTextFormatting();
+
+    //word can be anything that doesn't contain whitepsace, so prefix and postifx are meant to contain special signs
+    FString GetWordFromString(const FString& Text, FString& OutPrefix, FString& OutPostfix, int32 Index = 0);
+    
+    //variables
     FText FullDialogueText;
     FString CurrentDialogueString;
     int32 DialogueIndex = 0;
     int32 CurrentTagStartIndex = INDEX_NONE;
     FTimerHandle TypewriterTimerHandle;
-    
-    void UpdateTypewriterEffect();
-    FString GetCurrentlyTypedWord();
-
-    UFUNCTION(BlueprintCallable, Category = "Dialogue")
-    void OnKeywordHovered(const FText& Keyword);
-
-    UFUNCTION(BlueprintCallable, Category = "Dialogue")
-    void OnKeywordUnhovered();
-
     bool bIsTypingFinished = true;
-    TArray<FUDSHoverKeywordRow*> CachedKeywords;
+    TArray<FUDSHoverKeywordRow*> CachedKeywords;    
+    UPROPERTY()
+    TObjectPtr<UDataTable> KeywordsDataTable;
+    
 
-    UFUNCTION()
-    void OnTypingFinished();
-
-    TArray<FUDSHoverKeywordRow*> GetHoverKeywords();
-    FString AppendRichTextFormatting(FString CurrentFormattedString);
 };
