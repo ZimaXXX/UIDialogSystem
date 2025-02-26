@@ -78,3 +78,4 @@ StarterContent
 /UIDialogSystem/DerivedDataCache
 /UIDialogSystem/Binaries
 /UIDialogSystem/*.vsconfig
+/UIDialogSystem/UIDialogSystem.sln.DotSettings.user
