@@ -46,6 +46,7 @@ protected:
 			if(TempCachedWidget.Get() && StaticCastSharedRef<STextBlock>(TempCachedWidget->GetContentWidget()).Get().GetText().ToString() == CurrentText)
 			{
 				CachedWidget = TempCachedWidget;
+				break;
 			}
 		}
 
